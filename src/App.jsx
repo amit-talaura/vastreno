@@ -246,6 +246,60 @@ export default function App() {
         </div>
       </section>
 
+      {/* Footer */}
+      <footer className="bg-[#1e1e1e] text-[#f5f2eb] pt-32 pb-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-16 mb-20">
+            <div className="md:col-span-2">
+              <h1 className="text-4xl font-black tracking-tighter uppercase italic mb-8">
+                Classic<span className="text-stone-500">Prints</span>
+              </h1>
+              <p className="text-stone-500 max-w-sm mb-8 leading-relaxed font-medium text-sm">
+                Redefining the standard of basic apparel through meticulous engineering and organic neutral aesthetics. 100% Cotton. 100% Quality.
+              </p>
+              <div className="flex gap-4">
+                <button className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center hover:bg-stone-800 transition-colors">
+                  <Instagram size={20} />
+                </button>
+                <button className="w-12 h-12 bg-stone-900 rounded-xl flex items-center justify-center hover:bg-stone-800 transition-colors">
+                  <Youtube size={20} />
+                </button>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-stone-600">Explore</h4>
+              <ul className="space-y-4 font-bold uppercase text-[11px] tracking-widest text-stone-400">
+                <li><a href="#shopall" className="hover:text-[#f5f2eb] transition-colors">Shop All</a></li>
+                <li><a href="#customlab" className="hover:text-[#f5f2eb] transition-colors">Custom Lab</a></li>
+                <li><a href="#" className="hover:text-[#f5f2eb] transition-colors">Our Process</a></li>
+                <li><a href="#" className="hover:text-[#f5f2eb] transition-colors">Shipping</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-black uppercase text-[10px] tracking-[0.3em] mb-8 text-stone-600">Newsletter</h4>
+              <div className="relative">
+                <input 
+                  type="email" 
+                  placeholder="Email address" 
+                  className="w-full bg-stone-900 border-none p-4 pr-12 rounded-xl text-xs font-bold focus:ring-2 focus:ring-stone-400 outline-none text-[#f5f2eb]"
+                />
+                <button className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#f5f2eb] transition-colors">
+                  <ArrowRight size={18} />
+                </button>
+              </div>
+              <p className="text-[10px] text-stone-600 font-bold uppercase mt-4 tracking-wider">Join our community for early access drops.</p>
+            </div>
+          </div>
+          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-[0.3em] text-stone-600">
+            <p>© 2024 Classic Prints. Crafted for Excellence.</p>
+            <div className="flex gap-8">
+              <span className="cursor-pointer hover:text-stone-400 transition-colors">Privacy Policy</span>
+              <span className="cursor-pointer hover:text-stone-400 transition-colors">Terms of Service</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
       {/* Cart Overlay */}
       {isCartOpen && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex justify-end">
@@ -257,14 +311,21 @@ export default function App() {
             <div className="flex-1 overflow-y-auto p-8 space-y-6">
               {cart.map(item => (
                 <div key={item.cartId} className="flex gap-4">
-                  <div className="w-20 h-24 bg-[#ece9e0] rounded-xl flex-shrink-0 overflow-hidden">
-                    {item.image && <img src={item.image} className="w-full h-full object-cover" alt="" />}
+                  <div className="w-20 h-24 bg-[#ece9e0] rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {item.isCustom ? (
+                      <div className="bg-stone-900 w-full h-full flex items-center justify-center p-2">
+                        <span className="text-[6px] text-white font-black uppercase text-center">{item.config.text}</span>
+                      </div>
+                    ) : (
+                      <img src={item.image} className="w-full h-full object-cover" alt="" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between font-black uppercase text-sm italic tracking-tighter">
                       <span>{item.name}</span>
                       <span>₹{item.price * item.qty}</span>
                     </div>
+                    {item.isCustom && <p className="text-[9px] font-bold text-stone-500 uppercase mt-1">"{item.config.text}" • {item.config.font}</p>}
                     <div className="flex items-center gap-4 mt-4">
                       <div className="flex items-center bg-[#ece9e0] rounded-lg px-2">
                         <button onClick={() => updateQty(item.cartId, -1)} className="p-1 px-2 font-bold">-</button>
@@ -276,6 +337,12 @@ export default function App() {
                   </div>
                 </div>
               ))}
+              {cart.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center text-stone-400 py-20">
+                  <ShoppingBag size={48} className="opacity-20 mb-4" />
+                  <p className="font-black uppercase tracking-widest text-[10px]">Your bag is empty</p>
+                </div>
+              )}
             </div>
             <div className="p-8 border-t bg-[#f5f2eb] space-y-4">
               <div className="flex justify-between font-black uppercase tracking-tighter text-xl">
