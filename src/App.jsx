@@ -1,10 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Menu, X, ShoppingBag, Search, ArrowRight, Lock, 
-  Layers, Droplet, Truck, RefreshCw, RotateCcw, Plus, Instagram, Youtube 
+  Layers, Droplet, Truck, RefreshCw, RotateCcw, Plus, Instagram, Youtube,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 // --- DATA ---
+const HERO_SLIDES = [
+  {
+    image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&q=80&w=1200",
+    title: "Essentials",
+    subtitle: "Refined"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=1200",
+    title: "Architecture",
+    subtitle: "Pure"
+  },
+  {
+    image: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&q=80&w=1200",
+    title: "Silhouettes",
+    subtitle: "Modern"
+  }
+];
+
 const PRODUCTS = [
   { id: 1, name: "Sand Heavyweight", price: 1299, category: "Essentials", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=800" },
   { id: 2, name: "Urban Box Tee", price: 1599, category: "Streetwear", image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=800" },
@@ -29,6 +48,7 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('M');
+  const [currentSlide, setCurrentSlide] = useState(0);
   
   // Lab State
   const [labConfig, setLabConfig] = useState({
@@ -42,6 +62,17 @@ export default function App() {
 
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+
+  // --- HERO CAROUSEL LOGIC ---
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
 
   // --- ACTIONS ---
   const addToCart = (product, isCustom = false) => {
@@ -139,15 +170,17 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* Hero with Carousel Effect */}
       <section className="relative min-h-[90vh] flex items-center px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center relative z-10">
-          <div className="lg:col-span-7 space-y-8">
-            <h1 className="text-6xl md:text-[7rem] font-black leading-[0.85] tracking-tighter uppercase italic">
-              Essentials<br />
-              <span className="text-transparent" style={{ WebkitTextStroke: '1px #1e1e1e' }}>Refined</span><br />
-              Daily.
-            </h1>
+          <div className="lg:col-span-7 space-y-8 z-20">
+            <div className="overflow-hidden">
+              <h1 className="text-6xl md:text-[7rem] font-black leading-[0.85] tracking-tighter uppercase italic">
+                {HERO_SLIDES[currentSlide].title}<br />
+                <span className="text-transparent" style={{ WebkitTextStroke: '1px #1e1e1e' }}>{HERO_SLIDES[currentSlide].subtitle}</span><br />
+                Daily.
+              </h1>
+            </div>
             <p className="text-stone-500 text-lg max-w-md">Engineered with 320 GSM heavy-weight Supima cotton. Architecture for the body.</p>
             <div className="flex gap-4">
               <button className="bg-[#1e1e1e] text-[#f5f2eb] px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] flex items-center gap-2 group">
@@ -155,8 +188,48 @@ export default function App() {
               </button>
             </div>
           </div>
-          <div className="lg:col-span-5 relative h-[500px]">
-             <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover rounded-[3rem] shadow-2xl" alt="Hero" />
+          
+          <div className="lg:col-span-5 relative h-[500px] md:h-[600px]">
+            {/* Carousel Images */}
+            {HERO_SLIDES.map((slide, index) => (
+              <div 
+                key={index}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+              >
+                <img 
+                  src={slide.image} 
+                  className="w-full h-full object-cover rounded-[3rem] shadow-2xl" 
+                  alt={slide.title} 
+                />
+              </div>
+            ))}
+
+            {/* Carousel Controls */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-30">
+              <button 
+                onClick={prevSlide}
+                className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all text-white"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              
+              <div className="flex gap-2">
+                {HERO_SLIDES.map((_, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`h-1.5 transition-all rounded-full ${index === currentSlide ? 'w-8 bg-stone-500' : 'w-2 bg-stone-400/30'}`}
+                  />
+                ))}
+              </div>
+
+              <button 
+                onClick={nextSlide}
+                className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all text-white"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
